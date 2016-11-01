@@ -375,8 +375,7 @@
         </select>
     </div>
     <div>
-        <input type="checkbox" id="chkPopupMenu" checked="checked">Popup
-        Menu
+        <input type="checkbox" id="chkPopupMenu" checked="checked">Popup Menu
     </div>
 </body>
 </html>
