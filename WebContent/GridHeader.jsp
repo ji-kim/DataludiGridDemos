@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
-<title>State Cells</title>
+<title>Grid Header</title>
 <script type="text/javascript" src="js/dataludi/jquery-1.8.3.min.js"></script>
 <!-- <script type="text/javascript" src="js/dataludi/jszip.min.js"></script> -->
 <script type="text/javascript" src="js/dataludi/jszip.min-3.1.3.js"></script>
@@ -14,7 +14,7 @@
         DataLudi.setDebug(true);
         DataLudi.setTrace(true);
 
-        var grdMain, grdMain2;
+        var grdMain;
         var dsMain;
 
         // dataset
@@ -54,13 +54,12 @@
             dataType : "datetime",
             datetimeFormat : "MM/dd/yyyy"
         } ]);
-        dsMain.setSoftDelete(true);
 
         // grid
         var columns = [ {
             "name" : "LoanNumber",
             "fieldName" : "loan_number",
-            "width" : "70",
+            "width" : "120",
             "styles" : {
                 textAlignment : "center"
             },
@@ -98,7 +97,7 @@
         }, {
             "name" : "ProjectID",
             "fieldName" : "project_id",
-            "width" : "70",
+            "width" : "90",
             "styles" : {
                 "textAlignment" : "center"
             },
@@ -114,6 +113,12 @@
             },
             "header" : {
                 "text" : "OriginalAmount"
+            },
+            "footer" : {
+                "expression" : "sum",
+                "styles" : {
+                    "numberFormat" : "#,##0"
+                }
             }
         }, {
             "name" : "CancelledAmount",
@@ -180,22 +185,13 @@
         } ];
         grdMain = DataLudi.createGridView("container");
         grdMain.setColumns(columns);
-        grdMain2 = DataLudi.createGridView("container2");
-        grdMain2.setColumns(columns);
-
-        grdMain.registerImageList({
-            name : 'stateIcons',
-            root : "assets/",
-            items : [ 'data_created.png', 'data_updated.png', 'data_deleted.png' ]
-        });
 
         //grid options
         grdMain.setOptions({
-            rowIndicator : {
-                stateVisible : true
-            },
             checkBar : false,
             header : {
+                resizable : true,
+                imageList : 'images01',
                 head : {
                     popupMenu : {
                         label : 'DataLudi Version',
@@ -205,38 +201,29 @@
                     }
                 }
             },
-            edit : {
-                updatable : true,
-                insertable : true,
-                deletable : true
+            footer : false,
+            vscrollBar : {
+                barWidth : 12,
+            },
+            hscrollBar : {
+                barWidth : 12
             }
         });
 
-        grdMain2.setOptions({
-            rowIndicator : {
-                stateVisible : true
-            },
-            checkBar : false,
-            header : {
-                head : {
-                    popupMenu : {
-                        label : 'DataLudi Version',
-                        callback : function() {
-                            alert(DataLudi.getVersion());
-                        }
-                    }
-                }
-            },
-            edit : {
-                updatable : true,
-                insertable : true,
-                deletable : true
+        // grid styles
+        grdMain.loadStyles({
+            grid : {
+                border : "#0088ff"
             }
+        });
+        grdMain.registerImageList({
+            name : "images01",
+            rootUrl : "assets/flags_iso/",
+            items : [ "ar.png", "at.png", "be.png", "br.png", "ca.png", "de.png", "dk.png", "et.png", "fi.png", "fr.png", "it.png", "jp.png", "kg.png" ]
         });
 
         // connect dataset
         grdMain.setDataSource(dsMain);
-        grdMain2.setDataSource(dsMain);
         $.ajax({
             url : "data/loan_statement_small.csv",
             dataType : 'text',
@@ -256,119 +243,111 @@
         // dataset events
         dsMain.onRowCountChanged = function(ds, count) {
             $("#rowCount").css("color", "blue").text(count.toLocaleString());
-            $("#rowCount2").css("color", "blue").text(count.toLocaleString());
+        };
+
+        // grid events
+        grdMain.onColumnChecked = function(grid, column, checked) {
+            console.log('Column "' + column.name() + '" is ' + (checked ? 'checked' : 'unchecked'));
+            column.styles().setBackground(checked ? '#200000ff' : '#ffffff');
         };
 
         // buttons
-        $('#chkStateVisible').click(function() {
-            var checked = document.getElementById('chkStateVisible').checked;
-            grdMain.rowIndicator().setStateVisible(checked);
+        $('#edtMinHeight')[0].value = grdMain.header().minHeight();
+        $('#chkVisible').click(function() {
+            var checked = document.getElementById('chkVisible').checked;
+            grdMain.header().setVisible(checked);
         });
-        $('#edtCreatedBackground').change(function() {
-            var value = document.getElementById('edtCreatedBackground').val();
-            var styles = grdMain.rowIndicator().createdStyles();
-            styles.setBackground(value);
-            document.getElementById('edtCreatedBackground').style.background = styles.background().css();
+        $('#chkHeight').click(function() {
+            var checked = document.getElementById('chkHeight').checked;
+            if (checked) {
+                view.btnHeight_click();
+            } else {
+                grdMain.header().setHeight(0);
+            }
         });
-        $('#edtUpdatedBackground').change(function() {
-            var value = document.getElementById('edtUpdatedBackground').val();
-            var styles = grdMain.rowIndicator().updatedStyles();
-            styles.setBackground(value);
-            document.getElementById('edtUpdatedBackground').style.background = styles.background().css();
+        $('#btnHeight').click(function() {
+            if (document.getElementById('chkHeight').checked) {
+                grdMain.header().setHeight(document.getElementById('edtHeight').value);
+            }
         });
-        $('#edtDeletedBackground').change(function() {
-            var value = document.getElementById('edtDeletedBackground').val();
-            var styles = grdMain.rowIndicator().deletedStyles();
-            styles.setBackground(value);
-            document.getElementById('edtDeletedBackground').style.background = styles.background().css();
+        $('#btnMinHeight').click(function() {
+            grdMain.header().setMinHeight(document.getElementById('edtMinHeight').value);
         });
-        $('#btnSetShapes').click(function() {
-            grdMain.setRowIndicator({
-                stateWidth : 15,
-                stateStyles : {
-                    background : "#f8f8f8"
-                },
-                createdStyles : {
-                    shapeName : "plus",
-                    shapeColor : "#f00"
-                },
-                updatedStyles : {
-                    shapeName : "circle",
-                    shapeColor : "#00f",
-                    shapeSize : "70%"
-                },
-                deletedStyles : {
-                    shapeName : "minus",
-                    shapeColor : "#333"
+        $('#chkMenuVisible').click(function() {
+            var checked = document.getElementById('chkMenuVisible').checked;
+            grdMain.header().head().setMenuVisible(checked);
+        });
+        $('#btnStyles1').click(function() {
+            grdMain.loadStyles({
+                header : {
+                    background : '#100000ff',
+                    selectedBackground : '#300000ff',
+                    color : '#000088',
+                    selectedColor : undefined,
+                    fontBold : true,
+                    head : {
+                        shapeColor : '#800000ff',
+                        shapeHoveredColor : '#ff000000ff'
+                    }
                 }
             });
         });
-        $('#btnSetIcons').click(function() {
-            grdMain.setRowIndicator({
-                stateWidth : 15,
-                stateImageList : "stateIcons",
-                stateStyles : {
-                    background : "#f8f8f8"
-                },
-                createdStyles : {
-                    iconIndex : '0'
-                },
-                updatedStyles : {
-                    iconIndex : '1'
-                },
-                deletedStyles : {
-                    iconIndex : '2'
+        $('#btnStyles2').click(function() {
+            grdMain.loadStyles({
+                header : {
+                    background : '#fff',
+                    selectedBackground : '#100000ff',
+                    selectedColor : undefined,
+                    color : '#000088',
+                    fontBold : false,
+                    head : {
+                        shapeColor : '#800000ff',
+                        shapeHoveredColor : '#ff000000ff'
+                    }
                 }
             });
         });
-        $('#btnSetLabels').click(function() {
-            grdMain2.setRowIndicator({
-                stateWidth : 15,
-                stateStyles : {
-                    background : "#f8f8f8"
-                },
-                createdLabel : "C",
-                updatedLabel : "U",
-                deletedLabel : "D"
+        $('#btnStyles3').click(function() {
+            grdMain.loadStyles({
+                header : {
+                    background : '#c00088ff',
+                    selectedBackground : '#c00000cc',
+                    color : '#fff',
+                    selectedColor : '#fff',
+                    fontBold : false,
+                    head : {
+                        shapeColor : '#eee',
+                        shapeHoveredColor : '#ff000000ff'
+                    }
+                }
             });
         });
-        var indicator = grdMain.rowIndicator();
-        $('#edtCreatedBackground').val(indicator.createdStyles().background().toText());
-        $('#edtCreatedBackground').css('background', indicator.createdStyles().background().css());
-        $('#edtUpdatedBackground').val(indicator.updatedStyles().background().toText());
-        $('#edtUpdatedBackground').css('background', indicator.updatedStyles().background().css());
-        $('#edtDeletedBackground').val(indicator.deletedStyles().background().toText());
-        $('#edtDeletedBackground').css('background', indicator.deletedStyles().background().css());
     });
 </script>
 </head>
 <body>
-    <h3>State Cells</h3>
-    <input type="checkbox" id="chkStateVisible" checked="checked">RowIndicator.stateVisible
+    <h3>Grid Header</h3>
     <div id="container" style="height: 550px; width: 740px; min-width: 500px"></div>
     <div>
         <span id="rowCount" style="">0</span> rows.
     </div>
     <div>
-        <span>DataRowState.CREATED</span>
-        <input type="text" id="edtCreatedBackground" value="#600099ff">
-        <span>UPDATED</span>
-        <input type="text" id="edtUpdatedBackground" value="#20000000">
-        <span>DELETED</span>
-        <input type="text" id="edtDeletedBackground" value="#80000000">
+        <input type="checkbox" id="chkVisible" checked="checked">Header Visible
     </div>
     <div>
-        <button id="btnSetShapes">상태별 Shape 지정하기</button>
+        <input type="checkbox" id="chkHeight" checked="checked">Header Height
+        <input type="text" id="edtHeight" value="30">
+        <button id="btnHeight">높이 변경</button>
+        <input type="text" id="edtMinHeight" value="0">
+        <button id="btnMinHeight">최소 높이 변경</button>
     </div>
     <div>
-        <button id="btnSetIcons">상태별 icon 지정하기</button>
-    </div>
-    <div id="container2" style="height: 550px; width: 740px; min-width: 500px"></div>
-    <div>
-        <span id="rowCount2" style="">0</span> rows.
+        <input type="checkbox" id="chkMenuVisible" checked="checked">Head Menu Visible
     </div>
     <div>
-        <button id="btnSetLabels">상태별 label 지정하기</button>
+        <button id="btnStyles1">Styles 1</button>
+        <button id="btnStyles2">Styles 2</button>
+        <button id="btnStyles3">Styles 3</button>
     </div>
 </body>
 </html>

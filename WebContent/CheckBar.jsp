@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
-<title>State Cells</title>
+<title>Check Bar</title>
 <script type="text/javascript" src="js/dataludi/jquery-1.8.3.min.js"></script>
 <!-- <script type="text/javascript" src="js/dataludi/jszip.min.js"></script> -->
 <script type="text/javascript" src="js/dataludi/jszip.min-3.1.3.js"></script>
@@ -183,56 +183,51 @@
         grdMain2 = DataLudi.createGridView("container2");
         grdMain2.setColumns(columns);
 
-        grdMain.registerImageList({
-            name : 'stateIcons',
-            root : "assets/",
-            items : [ 'data_created.png', 'data_updated.png', 'data_deleted.png' ]
-        });
-
         //grid options
-        grdMain.setOptions({
-            rowIndicator : {
-                stateVisible : true
-            },
-            checkBar : false,
-            header : {
-                head : {
-                    popupMenu : {
-                        label : 'DataLudi Version',
-                        callback : function() {
-                            alert(DataLudi.getVersion());
-                        }
-                    }
-                }
-            },
-            edit : {
-                updatable : true,
-                insertable : true,
-                deletable : true
+        grdMain.header().setHeight(30);
+        grdMain.header().head().setPopupMenu({
+            label : 'DataLudi Version',
+            callback : function() {
+                alert(DataLudi.getVersion());
             }
         });
+        grdMain.body().setRowDynamicStyles([ {
+            expression : "checked",
+            styles : {
+                background : "#1000ff88"
+            }
+        } ]);
+        grdMain.displayOptions().setRowHoverMask(true);
 
-        grdMain2.setOptions({
-            rowIndicator : {
-                stateVisible : true
-            },
-            checkBar : false,
-            header : {
-                head : {
-                    popupMenu : {
-                        label : 'DataLudi Version',
-                        callback : function() {
-                            alert(DataLudi.getVersion());
-                        }
-                    }
-                }
-            },
-            edit : {
-                updatable : true,
-                insertable : true,
-                deletable : true
+        grdMain2.header().setHeight(30);
+        grdMain2.header().head().setPopupMenu({
+            label : 'DataLudi Version',
+            callback : function() {
+                alert(DataLudi.getVersion());
             }
         });
+        grdMain2.body().setRowDynamicStyles([ {
+            expression : "checked",
+            styles : {
+                background : "#100000ff"
+            }
+        } ]);
+        grdMain2.displayOptions().setRowHoverMask({
+            visible : true,
+            styles : {
+                background : "#150088ff"
+            }
+        });
+        grdMain2.loadStyles({
+            checkBar : {
+                shapeName : 'rectangle',
+                shapeColor : '#f00',
+                head : {
+                    shapeName : 'rectangle',
+                    shapeColor : '#f00'
+                }
+            }
+        })
 
         // connect dataset
         grdMain.setDataSource(dsMain);
@@ -260,115 +255,122 @@
         };
 
         // buttons
-        $('#chkStateVisible').click(function() {
-            var checked = document.getElementById('chkStateVisible').checked;
-            grdMain.rowIndicator().setStateVisible(checked);
+        $('#chkCheckBarVisible').click(function() {
+            var checked = document.getElementById('chkCheckBarVisible').checked;
+            grdMain.checkBar().setVisible(checked);
         });
-        $('#edtCreatedBackground').change(function() {
-            var value = document.getElementById('edtCreatedBackground').val();
-            var styles = grdMain.rowIndicator().createdStyles();
-            styles.setBackground(value);
-            document.getElementById('edtCreatedBackground').style.background = styles.background().css();
+        $('#chkCheckable').click(function() {
+            var checked = document.getElementById('chkCheckable').checked;
+            grdMain.editOptions().setCheckable(checked);
         });
-        $('#edtUpdatedBackground').change(function() {
-            var value = document.getElementById('edtUpdatedBackground').val();
-            var styles = grdMain.rowIndicator().updatedStyles();
-            styles.setBackground(value);
-            document.getElementById('edtUpdatedBackground').style.background = styles.background().css();
+        $('#chkCheckDraggable').click(function() {
+            var checked = document.getElementById('chkCheckDraggable').checked;
+            grdMain.checkBar().setDraggable(checked);
         });
-        $('#edtDeletedBackground').change(function() {
-            var value = document.getElementById('edtDeletedBackground').val();
-            var styles = grdMain.rowIndicator().deletedStyles();
-            styles.setBackground(value);
-            document.getElementById('edtDeletedBackground').style.background = styles.background().css();
+        $('#chkExclusive').click(function() {
+            var checked = document.getElementById('chkExclusive').checked;
+            grdMain.checkBar().setExclusive(checked);
         });
-        $('#btnSetShapes').click(function() {
-            grdMain.setRowIndicator({
-                stateWidth : 15,
-                stateStyles : {
-                    background : "#f8f8f8"
-                },
-                createdStyles : {
-                    shapeName : "plus",
-                    shapeColor : "#f00"
-                },
-                updatedStyles : {
-                    shapeName : "circle",
-                    shapeColor : "#00f",
-                    shapeSize : "70%"
-                },
-                deletedStyles : {
-                    shapeName : "minus",
-                    shapeColor : "#333"
+
+        $('#btnApplyCheckedStyle').click(function() {
+            grdMain.body().setRowDynamicStyles([ {
+                expression : 'checked',
+                styles : {
+                    background : '#3000ff00'
                 }
-            });
+            } ]);
         });
-        $('#btnSetIcons').click(function() {
-            grdMain.setRowIndicator({
-                stateWidth : 15,
-                stateImageList : "stateIcons",
-                stateStyles : {
-                    background : "#f8f8f8"
-                },
-                createdStyles : {
-                    iconIndex : '0'
-                },
-                updatedStyles : {
-                    iconIndex : '1'
-                },
-                deletedStyles : {
-                    iconIndex : '2'
-                }
-            });
+        $('#btnDeleteCheckedRows').click(function() {
+            var rows = grdMain.getCheckedRows();
+            grdMain.deleteRows(rows, true);
         });
-        $('#btnSetLabels').click(function() {
-            grdMain2.setRowIndicator({
-                stateWidth : 15,
-                stateStyles : {
-                    background : "#f8f8f8"
-                },
-                createdLabel : "C",
-                updatedLabel : "U",
-                deletedLabel : "D"
-            });
+        $('#btnIsChecked').click(function() {
+            var row = grdMain2.focusedRow();
+            if (row) {
+                alert(grdMain2.isChecked(row) ? 'Checked' : 'Not checked');
+            } else {
+                alert(strings["IsCheck"]);
+            }
         });
-        var indicator = grdMain.rowIndicator();
-        $('#edtCreatedBackground').val(indicator.createdStyles().background().toText());
-        $('#edtCreatedBackground').css('background', indicator.createdStyles().background().css());
-        $('#edtUpdatedBackground').val(indicator.updatedStyles().background().toText());
-        $('#edtUpdatedBackground').css('background', indicator.updatedStyles().background().css());
-        $('#edtDeletedBackground').val(indicator.deletedStyles().background().toText());
-        $('#edtDeletedBackground').css('background', indicator.deletedStyles().background().css());
+        $('#btnCheckRow').click(function() {
+            var row = grdMain2.focusedRow();
+            if (row) {
+                grdMain2.setChecked(row, true);
+            } else {
+                alert(strings["CheckRow"]);
+            }
+        });
+        $('#btnCheckRowExclusive').click(function() {
+            var row = grdMain2.focusedRow();
+            if (row) {
+                grdMain2.setChecked(row, true, true);
+            } else {
+                alert(strings["CheckRow"]);
+            }
+        });
+        $('#btnUncheckRow').click(function() {
+            var row = grdMain2.focusedRow();
+            if (row) {
+                grdMain2.setChecked(row, false);
+            } else {
+                alert("UncheckRow");
+            }
+        });
+        $('#btnCheckAll').click(function() {
+            grdMain2.checkAll(true);
+            grdMain2.setAllChecked(true);
+        });
+        $('#btnUncheckAll').click(function() {
+            grdMain2.checkAll(false);
+            grdMain2.setAllChecked(false);
+        });
+        $('#btnCheckSelected').click(function() {
+            var rows = grdMain2.getSelectedRows();
+            grdMain2.checkRows(rows, true);
+        });
+        $('#chkCheckAllExpr').click(function(ev) {
+            var checked = document.getElementById()
+            grdMain2.checkBar().setCheckAllExpression(ev.target.checked ? "values['interest_rate'] > 4" : null);
+        });
     });
 </script>
 </head>
 <body>
-    <h3>State Cells</h3>
-    <input type="checkbox" id="chkStateVisible" checked="checked">RowIndicator.stateVisible
+    <h3>Check Bar</h3>
+    <div>
+        <input type="checkbox" id="chkCheckBarVisible" checked="checked">CheckBar Visible
+        <input type="checkbox" id="chkCheckable" checked="checked">Checkable
+        <input type="checkbox" id="chkCheckDraggable">CheckBar Draggable
+    </div>
     <div id="container" style="height: 550px; width: 740px; min-width: 500px"></div>
     <div>
         <span id="rowCount" style="">0</span> rows.
     </div>
     <div>
-        <span>DataRowState.CREATED</span>
-        <input type="text" id="edtCreatedBackground" value="#600099ff">
-        <span>UPDATED</span>
-        <input type="text" id="edtUpdatedBackground" value="#20000000">
-        <span>DELETED</span>
-        <input type="text" id="edtDeletedBackground" value="#80000000">
+        <input type="checkbox" id="chkExclusive">Exclusive
     </div>
     <div>
-        <button id="btnSetShapes">상태별 Shape 지정하기</button>
+        <button id="btnApplyCheckedStyle">Apply Style</button>
     </div>
     <div>
-        <button id="btnSetIcons">상태별 icon 지정하기</button>
+        <button id="btnDeleteCheckedRows">Checked 행들 삭제</button>
+    </div>
+    <p>
+    <div>
+        <button id="btnIsChecked">Is Checked?</button>
+        <button id="btnCheckRow">Check Row</button>
+        <button id="btnCheckRowExclusive">Check Row Exclusively</button>
+        <button id="btnUncheckRow">Uncheck Row</button>
+        <button id="btnCheckAll">Check All</button>
+        <button id="btnUncheckAll">Uncheck All</button>
+        <button id="btnCheckSelected">Check Selected Rows</button>
+    </div>
+    <div>
+        <input type="checkbox" id="chkCheckAllExpr">Check All Expression
     </div>
     <div id="container2" style="height: 550px; width: 740px; min-width: 500px"></div>
     <div>
         <span id="rowCount2" style="">0</span> rows.
-    </div>
-    <div>
-        <button id="btnSetLabels">상태별 label 지정하기</button>
     </div>
 </body>
 </html>
