@@ -1,0 +1,5 @@
+﻿Icon,Tree,Loan Number,Country,Interest Rate,Currency of Commitment,Project ID,Original Principal Amount,Cancelled Amount,Disbursed Amount,Repaid to IBRD,Sold 3rd Party,First Repayment Date,Last Repayment Date
+0,1,IBRD00010,France,4.25,USD,P037383,"$250,000,000.00 ",$0.00 ,"$250,000,000.00 ","$38,000.00 ","$249,962,000.00 ",11/01/1952,05/01/1977
+0,1.1,IBRD00020,Netherlands,4.25,USD,P037452,"$191,044,211.75 ",$0.00 ,"$191,044,211.75 ","$103,372,211.75 ","$87,672,000.00 ",04/01/1952,10/01/1972
+0,1.2,IBRD00021,Netherlands,4.25,USD,P037452,"$3,955,788.25 ",$0.00 ,"$3,955,788.25 ",$0.00 ,"$3,955,788.25 ",04/01/1953,04/01/1954
+1,2,IBRD00060,Chile,3.75,USD,P006577,"$2,500,000.00 ",$0.00 ,"$2,500,000.00 ","$755,000.00 ","$1,745,000.00 ",07/01/1950,01/01/1955
