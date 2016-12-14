@@ -9,7 +9,7 @@
 <script type="text/javascript" src="js/dataludi/jszip.min-3.1.3.js"></script>
 <script type="text/javascript" src="js/dataludi/dataludi-eval-lic.js"></script>
 <script type="text/javascript" src="js/dataludi/dataludi-eval.min.js"></script>
-<script type="text/javascript" src="js/dataludi/dataludi-report.js"></script>
+<script type="text/javascript" src="js/dataludi/dataludi-report.min.js"></script>
 <script>
     $(document).ready(function() {
         DataLudi.setDebug(true);
@@ -277,13 +277,16 @@
         
         // button
         $('#btnPrint').click(function () {
-            DLReport.preview(grdMain, report, null, printOptions, true);
+            DLReport.preview(grdMain, report, null, printOptions, $('#chkPrint').is(':checked'));
         });
     });
 </script>
 </head>
 <body>
-	<div><button id="btnPrint">Print</button></div>
-    <div id="container" style="height:550px;width:95%;min-width:500px;position:absolute;padding-top:7px;"></div>
+	<div>
+	   <button id="btnPrint">Print</button>
+	   <input type="checkbox" id="chkPrint" checked="checked">바로 출력 (Check하면 현재 크롬에서 출력 미리보기 창이 바로 열립니다.)
+	</div>
+    <div id="container" style="height: 550px; width: 740px; min-width: 500px;"></div>
 </body>
 </html>
