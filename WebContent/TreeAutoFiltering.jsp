@@ -3,46 +3,26 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
-<title>Paging - Row Offset</title>
+<title>Tree Auto Filtering</title>
 <script type="text/javascript" src="js/dataludi/jquery-1.8.3.min.js"></script>
 <!-- <script type="text/javascript" src="js/dataludi/jszip.min.js"></script> -->
 <script type="text/javascript" src="js/dataludi/jszip.min-3.1.3.js"></script>
 <script type="text/javascript" src="js/dataludi/dataludi-eval-lic.js"></script>
-<!-- <script type="text/javascript" src="js/dataludi/dataludi-eval.min.js"></script> -->
-<script type="text/javascript" src="js/dataludi/dataludi.js"></script>
+<script type="text/javascript" src="js/dataludi/dataludi-eval.min.js"></script>
 <script type="text/javascript" src="js/theme/flatbluestyle.js"></script>
 <script>
     $(document).ready(function() {
         DataLudi.setDebug(true);
         DataLudi.setTrace(true);
 
-        var grdMain;
+        var treeMain;
         var dsMain;
 
-        function loadData(start) {
-            dsMain.clearRows();
-
-            $.ajax({
-                url : "data/loan_statement_small.csv",
-                dataType : 'text',
-                success : function(data) {
-                    new DataLudi.DataLoader(dsMain).load("csv", data, {
-                        start : 1 + start,
-                        count : 10,
-                        quoted : true,
-                        currency : true
-                    });
-                },
-                error : function(xhr, status, error) {
-                    var err = status + ', ' + error;
-                    alert("jQuery getJSON() Failed: " + err);
-                }
-            });
-        };
-
         // dataset
-        dsMain = DataLudi.createGridDataSet();
+        dsMain = DataLudi.createTreeDataSet();
         dsMain.setFields([ {
+            fieldName : "icon"
+        }, {
             fieldName : "loan_number"
         }, {
             fieldName : "country"
@@ -77,15 +57,17 @@
             dataType : "datetime",
             datetimeFormat : "MM/dd/yyyy"
         } ]);
+        dsMain.setProperties({
+            datetimeFormat : "MM/dd/yyyy"
+        });
 
         // grid
-        grdMain = DataLudi.createGridView("container");
-        grdMain.setColumns([ {
+        var columns = [ {
             "name" : "LoanNumber",
             "fieldName" : "loan_number",
-            "width" : "70",
+            "width" : "160",
             "styles" : {
-                textAlignment : "center"
+                textAlignment : "near"
             },
             "header" : {
                 "text" : "LoanNumber"
@@ -93,17 +75,23 @@
         }, {
             "name" : "Country",
             "fieldName" : "country",
-            "width" : "70",
-            "styles" : {},
+            "width" : "120",
+            "styles" : {
+                "background" : "#1000ff88"
+            },
             "header" : {
                 "text" : "Country"
+            },
+            "autoFilter" : {
+                "active" : true
             }
         }, {
             "name" : "InterestRate",
             "fieldName" : "interest_rate",
             "width" : "65",
             "styles" : {
-                "textAlignment" : "far"
+                "textAlignment" : "far",
+                "background" : "#100088ff"
             },
             "header" : {
                 "text" : "InterestRate"
@@ -114,6 +102,14 @@
                     "prefix" : "Average" + ": ",
                     "numberFormat" : "#,##0.00"
                 }
+            },
+            "filters" : [ {
+                "name" : "Filter",
+                "expression" : "value >= 4"
+            } ],
+            "autoFilter" : {
+                "active" : true,
+                "valueScale" : -1
             }
         }, {
             "name" : "Currency",
@@ -144,9 +140,10 @@
         }, {
             "name" : "OriginalAmount",
             "fieldName" : "original_amount",
-            "width" : 105,
+            "width" : 110,
             "styles" : {
-                "textAlignment" : "far"
+                "textAlignment" : "far",
+                "numberFormat" : "#,##0.00"
             },
             "header" : {
                 "text" : "OriginalAmount"
@@ -164,9 +161,10 @@
         }, {
             "name" : "CancelledAmount",
             "fieldName" : "cancelled_amount",
-            "width" : 100,
+            "width" : 110,
             "styles" : {
-                "textAlignment" : "far"
+                "textAlignment" : "far",
+                "numberFormat" : "#,##0.00"
             },
             "header" : {
                 "text" : "CancelledAmount"
@@ -183,7 +181,8 @@
             "fieldName" : "disbursed_amount",
             "width" : 110,
             "styles" : {
-                "textAlignment" : "far"
+                "textAlignment" : "far",
+                "numberFormat" : "#,##0.00"
             },
             "header" : {
                 "text" : "DisbursedAmount"
@@ -195,49 +194,6 @@
                     "prefix" : "분산=>$",
                     "numberFormat" : "#,##0"
                 }
-            }
-        }, {
-            "name" : "RepaidAmount",
-            "fieldName" : "repaid_amount",
-            "width" : 110,
-            "styles" : {
-                "textAlignment" : "far"
-            },
-            "header" : {
-                "text" : "RepaidAmount"
-            },
-            "footer" : {
-                "expression" : "sum",
-                "styles" : {
-                    "prefix" : "$",
-                    "numberFormat" : "#,##0"
-                }
-            }
-        }, {
-            "name" : "SoldAmount",
-            "fieldName" : "sold_amount",
-            "width" : 110,
-            "styles" : {
-                "textAlignment" : "far"
-            },
-            "header" : {
-                "text" : "SoldAmount"
-            },
-            "footer" : {
-                "styles" : {
-                    "prefix" : "$",
-                    "textAlignment" : "far",
-                    "numberFormat" : "0,000",
-                    "postfix" : " $",
-                    "font" : "Arial,12"
-                },
-                "text" : "SUM",
-                "expression" : "sum",
-                /*"expression": "sum[4]",*/
-                "dynamicStyles" : [ {
-                    "criteria" : "value > 10000",
-                    "styles" : "color=#ff0000"
-                } ]
             }
         }, {
             "name" : "FirstDate",
@@ -261,109 +217,150 @@
             "header" : {
                 "text" : "LastDate"
             }
-        } ]);
-
-        //grid options
-        grdMain.checkBar().setVisible(false);
-        grdMain.header().setHeight(30);
-        grdMain.footer().setVisible(false);
-        grdMain.setEditOptions({
-            updatable : true,
-            insertable : true,
-            appendable : true,
-            deletable : true
-        })
-        grdMain.header().head().setPopupMenu({
-            label : 'DataLudi Grids Version',
+        } ];
+        treeMain = DataLudi.createTreeView("treeMain");
+        treeMain.setColumns(columns);
+        treeMain.header().head().setPopupMenu([ {
+            label : 'DataLudi Version',
             callback : function() {
                 alert(DataLudi.getVersion());
             }
+        }, {
+            label : 'Expand All',
+            callback : function() {
+                treeMain.expandAll();
+            }
+        }, {
+            label : 'Collapse All',
+            callback : function() {
+                treeMain.collapseAll();
+            }
+        } ]);
+
+        treeMain.setOptions({
+            "header.height" : 30,
+            "checkBar.visible" : false,
+            "rowIndicator.stateVisible" : true,
+            "hscrollBar.barWidth" : 12,
+            "vscrollBar.barWidth" : 12,
+            tree : {
+                expanderWithCellStyles : true,
+                iconField : 'icon',
+                iconList : "images01",
+                checkBoxVisible : true
+            },
+            body : {
+                rowDynamicStyles : [ {
+                    expression : 'checked',
+                    styles : {
+                        background : '#100000ff'
+                    }
+                } ]
+            },
+            edit : {
+                insertable : true,
+                appendable : true,
+                deletable : true
+            },
+            operate : {
+                passiveFiltering : true
+            }
+        });
+        treeMain.loadStyles(flatbluestyles, {
+            grid : {
+                border : "#800000ff"
+            }
+        });
+        treeMain.registerImageList({
+            name : "images01",
+            rootUrl : "assets/flags_iso/",
+            items : [ "ar.png", "at.png", "be.png", "br.png", "ca.png", "de.png", "dk.png", "et.png", "fi.png", "fr.png", "it.png", "jp.png", "kg.png" ]
         });
 
         // connect dataset
-        grdMain.setDataSource(dsMain);
-        loadData(0);
+        treeMain.setDataSource(dsMain);
+        $.ajax({
+            url : "data/loan_statement_tree.csv",
+            dataType : 'text',
+            success : function(data) {
+                DataLudi.loadCsvData(dsMain, data, {
+                    start : 1,
+                    quoted : true,
+                    currency : true,
+                    treeField : 1,
+                    useTreeField : false
+                });
+                treeMain.expandAll();
+            },
+            error : function(xhr, status, error) {
+                var err = status + ', ' + error;
+                alert("jQuery ajax() Failed: " + err);
+            }
+        });
 
         // dataset events
         dsMain.onRowCountChanged = function(ds, count) {
             $("#rowCount").css("color", "blue").text(count.toLocaleString());
         };
 
-        // grid initialize
-        // $('#pagePanel').hide();        
-        var checkButtons = function() {
-            var count = grdMain.pageCount();
-            var page = grdMain.pageIndex();
-
-            $('#btnFirst').prop('disabled', page <= 0);
-            $('#btnPrev').prop('disabled', page <= 0);
-            $('#btnNext').prop('disabled', page >= count - 1);
-            $('#btnLast').prop('disabled', page >= count - 1);
-        };
-        grdMain.setPaging(true, 10, 6);
-
         // grid events
-        grdMain.onPaged = function(grid, paged) {
-            checkButtons();
-        };
-        grdMain.onPageCountChanged = function(grid, newCount, oldCount) {
-            checkButtons();
-        };
-        grdMain.onPageIndexChanging = function(grid, newPage, oldPage) {
-            console.log('### Page index changed: ' + oldPage + ' -> ' + newPage);
-        };
-        grdMain.onPageIndexChanged = function(grid, newPage, oldPage) {
-            $('#edtPage').val(newPage);
-            checkButtons();
-            if ($('#chkEventData').is(':checked')) {
-                loadData(grdMain.pageSize() * newPage);
-            }
-        };
-        function setPage(page) {
-            var size = grdMain.pageSize();
-            // 항상 첫 번째 행부터 표시한다.
-            grdMain.setPageAndOffset(page, -page * size);
-            if (!$('#chkEventData').is(':checked')) {
-                loadData(page * size);
-            }
-        };
+
         // buttons
-        $('#btnFirst').click(function() {
-            setPage(0);
+        $('#chkPassiveFiltering').click(function() {
+            var checked = document.getElementById('chkPassiveFiltering').checked;
+            treeMain.setOperateOptions({
+                passiveFiltering : checked
+            });
         });
-        $('#btnLast').click(function() {
-            setPage(grdMain.pageCount() - 1);
+        $('#chkActive').click(function() {
+            var checked = document.getElementById('chkActive').checked;
+            var col = treeMain.columnByName('InterestRate');
+            if (col) {
+                col.setAutoFilter(checked);
+            }
         });
-        $('#btnPrev').click(function() {
-            setPage(grdMain.pageIndex() - 1);
+        $('#btnCheckValue').click(function() {
+            var row = treeMain.focusedRow();
+            if (row) {
+                var col = treeMain.columnByName('Country');
+                var v = row.getValue(col.dataIndex());
+                col.autoFilter().checkValue(v, true);
+            }
         });
-        $('#btnNext').click(function() {
-            setPage(grdMain.pageIndex() + 1);
+        $('#btnCheckValues').click(function() {
+            var rows = treeMain.getSelectedRows();
+            if (rows && rows.length > 0) {
+                var col = treeMain.columnByName('Country');
+                var vals = treeMain.getFieldValues(col.dataIndex(), rows);
+                col.autoFilter().checkValues(vals, true);
+            }
         });
-        $('#btnGoto').click(function() {
-            setPage($('#edtPage').val());
+        $('#btnClearChecked').click(function() {
+            var col = treeMain.columnByName('InterestRate');
+            var col2 = treeMain.columnByName('Country');
+            if (col && col2) {
+                col.autoFilter().clearChecked();
+                col2.autoFilter().clearChecked();
+            }
         });
     });
 </script>
 </head>
 <body>
-    <h3>Paging - Row Offset</h3>
-    <div>
-        <input type="checkbox" id="chkEventData">In Event check하면 grid.onPageIndexChanged 에서 데이터 로드.
-        <br>
-        <input type="checkbox" id="chkDataIndex">DataIndex Indicator check하면 RowIndicator에 ROW_INDEX 대신 DATA_INDEX 표시.
-    </div>
-    <div id="pagePanel">
-        <button id="btnFirst">First</button>
-        <button id="btnPrev">&lt;</button>
-        <button id="btnNext">&gt;</button>
-        <button id="btnLast">Last</button>
-        <input type="text" id="edtPage" value="0">
-        <button id="btnGoto">Go to</button>
-    </div>
-    <div id="container" style="height: 550px; width: 740px; min-width: 500px"></div>
+    <h3>Tree Auto Filtering</h3>
+    <input type="checkbox" id="chkExpandRecursive" checked="checked">OperateOptions.passiveFiltering true면 자손행이 해당되면 조상행들도 남긴다.
+    <br>
+    <input type="checkbox" id="chkExpandRecursive" checked="checked">ColumnAutoFilter.active "이율" 컬럼 Auto 필터 활성화.
+    <div id="treeMain" style="height: 550px; width: 740px; min-width: 500px"></div>
     <div>
         <span id="rowCount" style="">0</span> rows.
+    </div>
+    <div>
+        <button id="btnCheckValue">Check Value</button> 선택 행의 "국가" 컬럼 Auto 필터 항목 선택.
+        <br>
+        <button id="btnCheckValues">Check Values</button> 선택 행들의 "국가" 컬럼 Auto 필터 항목 선택.
+        <br>
+        <button id="btnClearChecked">Clear Checked</button> "국가", "이율" 컬럼 Auto 필터 선택 모두 해제.
     </div>
 </body>
 </html>

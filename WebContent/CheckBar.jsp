@@ -328,9 +328,9 @@
             var rows = grdMain2.getSelectedRows();
             grdMain2.checkRows(rows, true);
         });
-        $('#chkCheckAllExpr').click(function(ev) {
-            var checked = document.getElementById()
-            grdMain2.checkBar().setCheckAllExpression(ev.target.checked ? "values['interest_rate'] > 4" : null);
+        $('#chkCheckAllExpr').click(function() {
+            var checked = document.getElementById('chkCheckAllExpr').checked;
+            grdMain2.checkBar().setCheckAllExpression(checked ? "values['interest_rate'] > 4" : null);
         });
     });
 </script>

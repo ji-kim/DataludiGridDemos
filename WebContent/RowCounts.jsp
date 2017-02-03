@@ -3,13 +3,12 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
-<title>Row Updating</title>
+<title>Row Counts</title>
 <script type="text/javascript" src="js/dataludi/jquery-1.8.3.min.js"></script>
 <!-- <script type="text/javascript" src="js/dataludi/jszip.min.js"></script> -->
 <script type="text/javascript" src="js/dataludi/jszip.min-3.1.3.js"></script>
 <script type="text/javascript" src="js/dataludi/dataludi-eval-lic.js"></script>
-<script type="text/javascript" src="js/dataludi/dataludi.js"></script>
-<!-- <script type="text/javascript" src="js/dataludi/dataludi-eval.min.js"></script> -->
+<script type="text/javascript" src="js/dataludi/dataludi-eval.min.js"></script>
 <script>
     $(document).ready(function() {
         DataLudi.setDebug(true);
@@ -43,8 +42,7 @@
         dsMain.setSoftDelete(true);
 
         // grid
-        grdMain = DataLudi.createGridView("container");
-        grdMain.setColumns([ {
+        var columns = [ {
             "name" : "Country",
             "fieldName" : "country",
             "width" : "70",
@@ -55,7 +53,7 @@
         }, {
             "name" : "CommCode",
             "fieldName" : "comm_code",
-            "width" : "90",
+            "width" : "110",
             "styles" : {
                 "textAlignment" : "center"
             },
@@ -65,7 +63,7 @@
         }, {
             "name" : "Commodity",
             "fieldName" : "commodity",
-            "width" : "200",
+            "width" : "90",
             "styles" : {},
             "header" : {
                 "text" : "Commodity"
@@ -73,7 +71,7 @@
         }, {
             "name" : "Year",
             "fieldName" : "year",
-            "width" : "60",
+            "width" : "65",
             "styles" : {
                 "textAlignment" : "center"
             },
@@ -93,13 +91,19 @@
         }, {
             "name" : "Trade",
             "fieldName" : "trade",
-            "width" : 60,
+            "width" : 80,
             "styles" : {
                 "textAlignment" : "far",
                 "numberFormat" : "#,##0"
             },
             "header" : {
-                "text" : "Trade"
+                "text" : "Trade",
+                "subText" : "(USD)",
+                "subStyles" : {
+                    "color" : "#f00",
+                    "fontSize" : 10,
+                    "fontBold" : false
+                }
             },
             "groupFooter" : {
                 "expression" : "sum",
@@ -111,7 +115,7 @@
         }, {
             "name" : "Weight",
             "fieldName" : "weight",
-            "width" : 70,
+            "width" : 90,
             "styles" : {
                 "textAlignment" : "far",
                 "numberFormat" : "#,##0"
@@ -129,28 +133,38 @@
         }, {
             "name" : "Unit",
             "fieldName" : "unit",
-            "width" : 120,
+            "width" : 110,
             "styles" : {},
             "header" : {
                 "text" : "Unit"
             }
-        } ]);
+        } ];
+        grdMain = DataLudi.createGridView("container");
+        grdMain.setColumns(columns);
 
         //grid options
+        grdMain.vscrollBar().setBarWidth(14);
         grdMain.checkBar().setVisible(false);
-        grdMain.rowIndicator().setStateVisible(true);
-
+        grdMain.footer().setVisible(false);
+        grdMain.groupPanel().setVisible(true);
+        grdMain.header().setHeight(30);
         grdMain.header().head().setPopupMenu({
-            label : 'DataLudi Version',
+            label : 'DataLudi Grid Version',
             callback : function() {
                 alert(DataLudi.getVersion());
             }
+        });
+        grdMain.rowGroup().setDisplayMode("banded");
+        grdMain.setEditOptions({
+            insertable : true,
+            appendable : true,
+            deletable : true
         });
 
         // connect dataset
         grdMain.setDataSource(dsMain);
         $.ajax({
-            url : "data/un_comtrade_of_goods_ss.csv",
+            url : "data/un_comtrade_of_goods_s.csv",
             dataType : 'text',
             success : function(data) {
                 new DataLudi.DataLoader(dsMain).load("csv", data, {
@@ -161,7 +175,7 @@
             },
             error : function(xhr, status, error) {
                 var err = status + ', ' + error;
-                alert("jQuery ajax() Failed: " + err);
+                alert("jQuery getJSON() Failed: " + err);
             }
         });
 
@@ -169,52 +183,53 @@
         dsMain.onRowCountChanged = function(ds, count) {
             $("#rowCount").css("color", "blue").text(count.toLocaleString());
         };
-        dsMain.onRowUpdating = function(grid, rowIndex) {
-            if ($('#chkEventUpdatable').is(':checked')) {
-                return false;
-            }
-        };
 
-        // grid events        
-        grdMain.onUpdating = function(grid, rowIndex) {
-            if ($('#chkEventGridUpdatable').is(':checked')) {
-                return false;
-            }
+        // grid events
+        grdMain.onRowCountChanged = function(grid, newCount, oldCount) {
+            $('#txtRowCount').text(newCount.toLocaleString());
+        };
+        grdMain.onDisplayRowCountChanged = function(grid, newCount, oldCount) {
+            $('#txtDisplayCount').text(newCount);
+        };
+        grdMain.onDescendantRowCountChanged = function(grid, newCount, oldCount) {
+            $('#txtDescendantRowCount').text(newCount.toLocaleString());
+        };
+        grdMain.onDescendantDataCountChanged = function(grid, newCount, oldCount) {
+            $('#txtDescendantDataCount').text(newCount.toLocaleString());
         };
 
         // buttons
-        $('#chkReadOnly').click(function() {
-            var checked = document.getElementById('chkReadOnly').checked;
-            grdMain.editOptions().setReadOnly(checked);
-        });
-        $('#chkUpdatable').click(function() {
-            var checked = document.getElementById('chkUpdatable').checked;
-            grdMain.editOptions().setUpdatable(checked);
-        });
-        $('#btnBeginUpdate').click(function() {
-            if (grdMain.edit(grdMain.focusedIndex())) {
-                grdMain.showEditor();
-            }
+        $('#btnRowCounts').click(function() {
+            $('#txtRowCount2').text(grdMain.rowCount().toLocaleString());
+            $('#txtDisplayCount2').text(grdMain.displayRowCount().toLocaleString());
+            $('#txtDescendantRowCount2').text(grdMain.descendantRowCount().toLocaleString());
+            $('#txtDescendantDataCount2').text(grdMain.descendantDataCount().toLocaleString());
         });
     });
 </script>
 </head>
 <body>
-    <h3>Row Updating</h3>
-    <div>
-        <input type="checkbox" id="chkReadOnly">ReadOnly 
-        <input type="checkbox" id="chkUpdatable" checked="checked">Updatable
-    </div>
+    <h3>Row Counts</h3>
     <div id="container" style="height: 550px; width: 740px; min-width: 500px"></div>
     <div>
         <span id="rowCount" style="">0</span> rows.
     </div>
-    <div>
-        <input type="checkbox" id="chkEventUpdatable">Not Data Updatable in Event
-    </div>
-    <div>
-        <input type="checkbox" id="chkEventGridUpdatable">Not Grid Updatable in Event
-    </div>
-    <button id="btnBeginUpdate">Begin Update</button>
+    <span>rowCount</span>
+    <span id="txtRowCount"></span>
+    <span id="txtRowCount2" style="color: red"></span>
+    <br>
+    <span>displayRowCount</span>
+    <span id="txtDisplayCount"></span>
+    <span id="txtDisplayCount2" style="color: red"></span>
+    <br>
+    <span>descendantRowCount</span>
+    <span id="txtDescendantRowCount"></span>
+    <span id="txtDescendantRowCount2" style="color: red"></span>
+    <br>
+    <span>descendantDataCount</span>
+    <span id="txtDescendantDataCount"></span>
+    <span id="txtDescendantDataCount2" style="color: red"></span>
+    <br>
+    <button id="btnRowCounts">Get Row Counts</button>각 개수 속성값을 가져와서 해당하는 위치의 우측에 붉은색으로 표시한다.
 </body>
 </html>

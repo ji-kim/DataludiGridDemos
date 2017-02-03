@@ -8,7 +8,8 @@
 <!-- <script type="text/javascript" src="js/dataludi/jszip.min.js"></script> -->
 <script type="text/javascript" src="js/dataludi/jszip.min-3.1.3.js"></script>
 <script type="text/javascript" src="js/dataludi/dataludi-eval-lic.js"></script>
-<script type="text/javascript" src="js/dataludi/dataludi-eval.min.js"></script>
+<script type="text/javascript" src="js/dataludi/dataludi.js"></script>
+<!-- <script type="text/javascript" src="js/dataludi/dataludi-eval.min.js"></script> --><script type="text/javascript" src="js/theme/flatbluestyle.js"></script>
 <script>
     $(document).ready(function() {
         DataLudi.setDebug(true);
@@ -44,7 +45,8 @@
         }, {
             fieldName : "order_date",
             dataType : "datetime",
-            datetimeFormat : "yyyy-MM-dd"
+            datetimeFormat : "yyyy-MM-dd",
+            zoneDelta: 540
         }, {
             fieldName : "ship_date",
             dataType : "datetime",
@@ -223,7 +225,7 @@
             var col = grdMain.columnByName('OrderDate');
             col.addFilters({
                 name : "2014 Year",
-                expression : "value >= date('2014-01-01 00:00') && value < date('2015-01-01 00:00')",
+                expression : "value >= date('2014-01-01T00:00:00+09:00') && value < date('2015-01-01T00:00:00+09:00')",
                 active : true
             });
         });

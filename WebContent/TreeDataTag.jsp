@@ -3,46 +3,25 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
-<title>Paging - Row Offset</title>
+<title>Tree Data Tag</title>
 <script type="text/javascript" src="js/dataludi/jquery-1.8.3.min.js"></script>
 <!-- <script type="text/javascript" src="js/dataludi/jszip.min.js"></script> -->
 <script type="text/javascript" src="js/dataludi/jszip.min-3.1.3.js"></script>
 <script type="text/javascript" src="js/dataludi/dataludi-eval-lic.js"></script>
-<!-- <script type="text/javascript" src="js/dataludi/dataludi-eval.min.js"></script> -->
-<script type="text/javascript" src="js/dataludi/dataludi.js"></script>
-<script type="text/javascript" src="js/theme/flatbluestyle.js"></script>
+<script type="text/javascript" src="js/dataludi/dataludi-eval.min.js"></script>
 <script>
     $(document).ready(function() {
         DataLudi.setDebug(true);
         DataLudi.setTrace(true);
 
-        var grdMain;
+        var treeMain;
         var dsMain;
 
-        function loadData(start) {
-            dsMain.clearRows();
-
-            $.ajax({
-                url : "data/loan_statement_small.csv",
-                dataType : 'text',
-                success : function(data) {
-                    new DataLudi.DataLoader(dsMain).load("csv", data, {
-                        start : 1 + start,
-                        count : 10,
-                        quoted : true,
-                        currency : true
-                    });
-                },
-                error : function(xhr, status, error) {
-                    var err = status + ', ' + error;
-                    alert("jQuery getJSON() Failed: " + err);
-                }
-            });
-        };
-
         // dataset
-        dsMain = DataLudi.createGridDataSet();
+        dsMain = DataLudi.createTreeDataSet();
         dsMain.setFields([ {
+            fieldName : "icon"
+        }, {
             fieldName : "loan_number"
         }, {
             fieldName : "country"
@@ -77,15 +56,17 @@
             dataType : "datetime",
             datetimeFormat : "MM/dd/yyyy"
         } ]);
+        dsMain.setProperties({
+            datetimeFormat : "MM/dd/yyyy"
+        });
 
         // grid
-        grdMain = DataLudi.createGridView("container");
-        grdMain.setColumns([ {
+        var columns = [ {
             "name" : "LoanNumber",
             "fieldName" : "loan_number",
-            "width" : "70",
+            "width" : "160",
             "styles" : {
-                textAlignment : "center"
+                textAlignment : "near"
             },
             "header" : {
                 "text" : "LoanNumber"
@@ -93,7 +74,7 @@
         }, {
             "name" : "Country",
             "fieldName" : "country",
-            "width" : "70",
+            "width" : "120",
             "styles" : {},
             "header" : {
                 "text" : "Country"
@@ -144,7 +125,7 @@
         }, {
             "name" : "OriginalAmount",
             "fieldName" : "original_amount",
-            "width" : 105,
+            "width" : 110,
             "styles" : {
                 "textAlignment" : "far"
             },
@@ -164,7 +145,7 @@
         }, {
             "name" : "CancelledAmount",
             "fieldName" : "cancelled_amount",
-            "width" : 100,
+            "width" : 110,
             "styles" : {
                 "textAlignment" : "far"
             },
@@ -197,49 +178,6 @@
                 }
             }
         }, {
-            "name" : "RepaidAmount",
-            "fieldName" : "repaid_amount",
-            "width" : 110,
-            "styles" : {
-                "textAlignment" : "far"
-            },
-            "header" : {
-                "text" : "RepaidAmount"
-            },
-            "footer" : {
-                "expression" : "sum",
-                "styles" : {
-                    "prefix" : "$",
-                    "numberFormat" : "#,##0"
-                }
-            }
-        }, {
-            "name" : "SoldAmount",
-            "fieldName" : "sold_amount",
-            "width" : 110,
-            "styles" : {
-                "textAlignment" : "far"
-            },
-            "header" : {
-                "text" : "SoldAmount"
-            },
-            "footer" : {
-                "styles" : {
-                    "prefix" : "$",
-                    "textAlignment" : "far",
-                    "numberFormat" : "0,000",
-                    "postfix" : " $",
-                    "font" : "Arial,12"
-                },
-                "text" : "SUM",
-                "expression" : "sum",
-                /*"expression": "sum[4]",*/
-                "dynamicStyles" : [ {
-                    "criteria" : "value > 10000",
-                    "styles" : "color=#ff0000"
-                } ]
-            }
-        }, {
             "name" : "FirstDate",
             "fieldName" : "first_date",
             "width" : "90",
@@ -261,109 +199,169 @@
             "header" : {
                 "text" : "LastDate"
             }
-        } ]);
-
-        //grid options
-        grdMain.checkBar().setVisible(false);
-        grdMain.header().setHeight(30);
-        grdMain.footer().setVisible(false);
-        grdMain.setEditOptions({
-            updatable : true,
-            insertable : true,
-            appendable : true,
-            deletable : true
-        })
-        grdMain.header().head().setPopupMenu({
-            label : 'DataLudi Grids Version',
+        } ];
+        treeMain = DataLudi.createTreeView("treeMain");
+        treeMain.setColumns(columns);
+        treeMain.header().head().setPopupMenu([ {
+            label : 'DataLudi Version',
             callback : function() {
                 alert(DataLudi.getVersion());
             }
+        }, {
+            label : '-'
+        }, {
+            label : 'Expand All',
+            callback : function() {
+                treeMain.expandAll();
+            }
+        }, {
+            label : 'Collapse All',
+            callback : function() {
+                treeMain.collapseAll();
+            }
+        } ]);
+
+        treeMain.setOptions({
+            "header.height" : 30,
+            "checkBar.visible" : false,
+            "rowIndicator.stateVisible" : true,
+            tree : {
+                expanderWithCellStyles : true,
+                iconField : 'icon',
+                iconList : "images01",
+                checkBoxVisible : true
+            },
+            body : {},
+            display : {
+                selectStyle : DataLudi.SelectionStyle.ROWS,
+            },
+            edit : {
+                insertable : true,
+                appendable : true,
+                deletable : true
+            }
+        });
+        treeMain.loadStyles({
+            body : {
+                rowDynamic : [ {
+                    expression : "tag == '#ludi'",
+                    styles : {
+                        background : '#200000ff'
+                    }
+                }, {
+                    expression : "tag == '#data'",
+                    styles : {
+                        background : '#20ff0000'
+                    }
+                } ]
+            }
+        });
+
+        treeMain.registerImageList({
+            name : "images01",
+            rootUrl : "assets/flags_iso/",
+            items : [ "ar.png", "at.png", "be.png", "br.png", "ca.png", "de.png", "dk.png", "et.png", "fi.png", "fr.png", "it.png", "jp.png", "kg.png" ]
         });
 
         // connect dataset
-        grdMain.setDataSource(dsMain);
-        loadData(0);
+        treeMain.setDataSource(dsMain);
+        $.ajax({
+            url : "data/loan_statement_tree.csv",
+            dataType : 'text',
+            success : function(data) {
+                DataLudi.loadCsvData(dsMain, data, {
+                    start : 1,
+                    quoted : true,
+                    currency : true,
+                    treeField : 1,
+                    useTreeField : false
+                });
+            },
+            error : function(xhr, status, error) {
+                var err = status + ', ' + error;
+                alert("jQuery ajax() Failed: " + err);
+            }
+        });
 
         // dataset events
-        dsMain.onRowCountChanged = function(ds, count) {
-            $("#rowCount").css("color", "blue").text(count.toLocaleString());
+        dsMain.onRowAdded = function(ds, index, dataRow) {
+            var row = treeMain.getRowOfDataRow(dataRow);
+            row.setIconIndex(2);
+        };
+        dsMain.onRowCountChanged = function(ds) {
+            $("#rowCount").css("color", "blue").text(ds.rowCount().toLocaleString())
         };
 
-        // grid initialize
-        // $('#pagePanel').hide();        
-        var checkButtons = function() {
-            var count = grdMain.pageCount();
-            var page = grdMain.pageIndex();
+        // tree events
+        treeMain.onRowCountChanged = function(tree, newCount, oldCount) {
+            $("#rowCount").css("color", "blue").text(newCount.toLocaleString());
+        };
 
-            $('#btnFirst').prop('disabled', page <= 0);
-            $('#btnPrev').prop('disabled', page <= 0);
-            $('#btnNext').prop('disabled', page >= count - 1);
-            $('#btnLast').prop('disabled', page >= count - 1);
-        };
-        grdMain.setPaging(true, 10, 6);
-
-        // grid events
-        grdMain.onPaged = function(grid, paged) {
-            checkButtons();
-        };
-        grdMain.onPageCountChanged = function(grid, newCount, oldCount) {
-            checkButtons();
-        };
-        grdMain.onPageIndexChanging = function(grid, newPage, oldPage) {
-            console.log('### Page index changed: ' + oldPage + ' -> ' + newPage);
-        };
-        grdMain.onPageIndexChanged = function(grid, newPage, oldPage) {
-            $('#edtPage').val(newPage);
-            checkButtons();
-            if ($('#chkEventData').is(':checked')) {
-                loadData(grdMain.pageSize() * newPage);
-            }
-        };
-        function setPage(page) {
-            var size = grdMain.pageSize();
-            // 항상 첫 번째 행부터 표시한다.
-            grdMain.setPageAndOffset(page, -page * size);
-            if (!$('#chkEventData').is(':checked')) {
-                loadData(page * size);
-            }
-        };
         // buttons
-        $('#btnFirst').click(function() {
-            setPage(0);
+        $('#btnSetLudiTag').click(function() {
+            var row = treeMain.focusedRow();
+            if (row) {
+                dsMain.setRowTag(row.dataRow(), '#ludi');
+            }
         });
-        $('#btnLast').click(function() {
-            setPage(grdMain.pageCount() - 1);
+        $('#btnSetDataTag').click(function() {
+            var row = treeMain.focusedRow();
+            if (row) {
+                dsMain.setRowTag(row.dataRow(), '#data');
+            }
         });
-        $('#btnPrev').click(function() {
-            setPage(grdMain.pageIndex() - 1);
+        $('#btnSetLudiTags').click(function() {
+            var rows = treeMain.getSelectedRows();
+            if (rows && rows.length > 0) {
+                rows = treeMain.getDataRowsOfRows(rows);
+                dsMain.setRowTags(rows, '#ludi');
+            }
         });
-        $('#btnNext').click(function() {
-            setPage(grdMain.pageIndex() + 1);
+        $('#btnSetDataTags').click(function() {
+            var rows = treeMain.getSelectedRows();
+            if (rows && rows.length > 0) {
+                rows = treeMain.getDataRowsOfRows(rows);
+                dsMain.setRowTags(rows, '#data');
+            }
         });
-        $('#btnGoto').click(function() {
-            setPage($('#edtPage').val());
+        $('#btnClearTags').click(function() {
+            dsMain.clearRowTags();
+        });
+        $('#btnSetRowFilter').click(function() {
+            treeMain.setRowFilter({
+                expression : "tag is not empty"
+            });
+        });
+        $('#btnClearRowFilter').click(function() {
+            treeMain.setRowFilter({
+                expression : null,
+                callback : null
+            });
+        });
+        $('#chkPassiveFiltering').click(function() {
+            var checked = document.getElementById('chkPassiveFiltering').checked;
+            treeMain.setOperateOptions({
+                passiveFiltering : checked
+            });
         });
     });
 </script>
 </head>
 <body>
-    <h3>Paging - Row Offset</h3>
-    <div>
-        <input type="checkbox" id="chkEventData">In Event check하면 grid.onPageIndexChanged 에서 데이터 로드.
-        <br>
-        <input type="checkbox" id="chkDataIndex">DataIndex Indicator check하면 RowIndicator에 ROW_INDEX 대신 DATA_INDEX 표시.
-    </div>
-    <div id="pagePanel">
-        <button id="btnFirst">First</button>
-        <button id="btnPrev">&lt;</button>
-        <button id="btnNext">&gt;</button>
-        <button id="btnLast">Last</button>
-        <input type="text" id="edtPage" value="0">
-        <button id="btnGoto">Go to</button>
-    </div>
-    <div id="container" style="height: 550px; width: 740px; min-width: 500px"></div>
+    <h3>Tree Data Tag</h3>
+    <button id="btnSetLudiTag">Set '#ludi' Tag</button>선택행의 tag를 '#ludi'로 지정한다.
+    <button id="btnSetDataTag">Set '#data' Tag</button>선택행의 tag를 '#tag'로 지정한다.
+    <br>
+    <button id="btnSetLudiTags">Set '#ludi' Tags</button>선택행들의 tag를 '#ludi'로 지정한다.
+    <button id="btnSetDataTags">Set '#data' Tags</button>선택행들의 tag를 '#tag'로 지정한다.
+    <br>
+    <button id="btnClearTags">Clear Tags</button>clearRowTags를 호출해서 설정된 tag들을 모두 제거한다.
+    <div id="treeMain" style="height: 550px; width: 740px; min-width: 500px"></div>
     <div>
         <span id="rowCount" style="">0</span> rows.
     </div>
+    <button id="btnSetRowFilter">Get Row Counts</button> Data tag가 설정된 행들만 표시한다.
+    <button id="btnClearRowFilter">Get Row Counts</button> Row Filter를 제거한다.
+    <input type="checkbox" id="chkPassiveFiltering">Passive Filtering
 </body>
 </html>

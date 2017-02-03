@@ -63,7 +63,7 @@
             }
         }, {
             "name" : "Commodity",
-            "fieldName" : "commodity",
+            "fieldName" : "commodsity",
             "width" : "200",
             "styles" : {},
             "header" : {

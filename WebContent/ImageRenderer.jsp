@@ -8,7 +8,8 @@
 <!-- <script type="text/javascript" src="js/dataludi/jszip.min.js"></script> -->
 <script type="text/javascript" src="js/dataludi/jszip.min-3.1.3.js"></script>
 <script type="text/javascript" src="js/dataludi/dataludi-eval-lic.js"></script>
-<script type="text/javascript" src="js/dataludi/dataludi-eval.min.js"></script>
+<script type="text/javascript" src="js/dataludi/dataludi.js"></script>
+<!-- <script type="text/javascript" src="js/dataludi/dataludi-eval.min.js"></script> -->
 <script>
     $(document).ready(function() {
         DataLudi.setDebug(true);
@@ -72,11 +73,11 @@
             valueCallback : logoCallback,
             styles : {},
             header : {
-                text : "ImageDisplay.NORMAL"
+                text : "ImageDisplay.DEFAULT"
             },
             renderer : {
                 type : "image",
-                "imageDisplay" : DataLudi.ImageDisplay.NORMAL
+                "imageDisplay" : DataLudi.ImageDisplay.DEFAULT
             }
         }, {
             name : "LogoCenter",

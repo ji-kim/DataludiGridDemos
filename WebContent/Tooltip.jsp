@@ -420,6 +420,24 @@
         // grid events
 
         // buttons
+        $('#chkShowTooltip').click(function () {
+        	var checked = document.getElementById('chkShowTooltip').checked;
+            grdMain.setDisplayOptions({
+                showTooltip: checked
+            });
+        });
+        $('#btnDelay').click(function () {
+            var v = parseInt($('#edtDelay')[0].value);
+            if (!isNaN(v) && v >= 0) {
+                grdMain.displayOptions().setTooltipDelay(v);  
+            }
+        });
+        $('#btnDuration').click(function () {
+            var v = parseInt($('#edtDuration')[0].value);
+            if (!isNaN(v) && v >= 0) {
+                grdMain.displayOptions().setTooltipDuration(v);  
+            }
+        });
         $('#btnStyles1').click(function() {
             grdMain.setDisplayOptions({
                 tooltipStyles: {
@@ -455,15 +473,18 @@
 </head>
 <body>
     <h3>Tooltip</h3>
+    <input type="checkbox" id="chkShowTooltip" checked="checked">showTooltip
     <div id="container" style="height: 550px; width: 740px; min-width: 500px"></div>
     <div>
         <span id="rowCount" style="">0</span> rows.
     </div>
     <div>
         <span>DisplayOptions.tooltipDelay:  </span>
+        <button id="btnDelay">Set</button>
         <input type="text" id="edtDelay" value="400">ms
         <br>
         <span>DisplayOptions.tooltipDuration:</span>
+        <button id="btnDuration">Set</button>
         <input type="text" id="edtDuration" value="4000">ms
     </div>
     <div>

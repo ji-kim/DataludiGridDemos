@@ -8,7 +8,8 @@
 <!-- <script type="text/javascript" src="js/dataludi/jszip.min.js"></script> -->
 <script type="text/javascript" src="js/dataludi/jszip.min-3.1.3.js"></script>
 <script type="text/javascript" src="js/dataludi/dataludi-eval-lic.js"></script>
-<script type="text/javascript" src="js/dataludi/dataludi-eval.min.js"></script>
+<script type="text/javascript" src="js/dataludi/dataludi.js"></script>
+<!-- <script type="text/javascript" src="js/dataludi/dataludi-eval.min.js"></script> -->
 <script>
     $(document).ready(function() {
         DataLudi.setDebug(true);
@@ -261,8 +262,8 @@
         <input type="radio" name="rgpExtent" value="fill">FILL
     </div>
     <div>
-        <button id="btnStyles1">스타일1</button>
-        <button id="btnStyles2">스타일2</button>
+        <button id="btnSetStyles1">스타일1</button>
+        <button id="btnSetStyles2">스타일2</button>
     </div>
 </body>
 </html>

@@ -8,7 +8,9 @@
 <!-- <script type="text/javascript" src="js/dataludi/jszip.min.js"></script> -->
 <script type="text/javascript" src="js/dataludi/jszip.min-3.1.3.js"></script>
 <script type="text/javascript" src="js/dataludi/dataludi-eval-lic.js"></script>
-<script type="text/javascript" src="js/dataludi/dataludi-eval.min.js"></script>
+<script type="text/javascript" src="js/dataludi/dataludi.js"></script>
+<!-- <script type="text/javascript" src="js/dataludi/dataludi-eval.min.js"></script> --><script type="text/javascript" src="js/theme/flatbluestyle.js"></script>
+<script type="text/javascript" src="js/theme/flatbluestyle.js"></script>
 <script>
 $(document).ready(function () {
     DataLudi.setDebug(true);
@@ -170,12 +172,14 @@ $(document).ready(function () {
     
     // texts
     $('#edtMin').change(function () {
+    	var value = $('#edtMin').val();
         var fld = dsMain.getFieldByName('field1');
-        fld.setMinimum(ev.target.value ? new Date(ev.target.value) : undefined);
+        fld.setMinimum(value ? new Date(value) : undefined);
     });
     $('#edtMax').change(function () {
+    	var value = $('#edtMax').val();
         var fld = dsMain.getFieldByName('field1');
-        fld.setMaximum(ev.target.value ? new Date(ev.target.value) : undefined);
+        fld.setMaximum(value ? new Date(value) : undefined);
     });
 });
 </script>

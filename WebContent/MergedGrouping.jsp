@@ -8,7 +8,8 @@
 <!-- <script type="text/javascript" src="js/dataludi/jszip.min.js"></script> -->
 <script type="text/javascript" src="js/dataludi/jszip.min-3.1.3.js"></script>
 <script type="text/javascript" src="js/dataludi/dataludi-eval-lic.js"></script>
-<script type="text/javascript" src="js/dataludi/dataludi-eval.min.js"></script>
+<script type="text/javascript" src="js/dataludi/dataludi.js"></script>
+<!-- <script type="text/javascript" src="js/dataludi/dataludi-eval.min.js"></script> -->
 <script>
     $(document).ready(function() {
         DataLudi.setDebug(true);
@@ -213,8 +214,8 @@
     </div>
     <div>
         <span>RowGroup.collapsedAdornments : </span>
-        <input type="radio" name="rgpCollapsedAdornments" value="both" checked="checked">RowGroupAdornments.BOTH
-        <input type="radio" name="rgpCollapsedAdornments" value="header">HEADER
+        <input type="radio" name="rgpCollapsedAdornments" value="both">RowGroupAdornments.BOTH
+        <input type="radio" name="rgpCollapsedAdornments" value="header" checked="checked">HEADER
         <input type="radio" name="rgpCollapsedAdornments" value="footer">FOOTER
     </div>
     <button id="btnExport">Export</button>

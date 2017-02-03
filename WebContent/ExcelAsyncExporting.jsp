@@ -18,60 +18,60 @@
         var dsMain;
         function loadData(ds, count) {
             grdMain.showToast('Load Data...');
-        	$.ajax({
+            $.ajax({
                 url: "data/orders.csv",
                 dataType: 'text',
                 success: function (data) {
-                	for (var i = 0; i < count; i++) {
-                    	new DataLudi.DataLoader(ds).load("csv", data, {
+                    for (var i = 0; i < count; i++) {
+                        new DataLudi.DataLoader(ds).load("csv", data, {
                             start:1,
                             fillMode: 'append'
-                    	});
-                	}
+                        });
+                    }
                 },
                 error: function (xhr, status, error) {
-                	var err = status + ', ' + error;
-                	alert("jQuery getJSON() Failed: " + err);
+                    var err = status + ', ' + error;
+                    alert("jQuery getJSON() Failed: " + err);
                 },
-    			complete: function () {
-    			    grdMain.hideToast();
-    			}
-        	});
+                complete: function () {
+                    grdMain.hideToast();
+                }
+            });
         };
 
         // dataset
         dsMain = DataLudi.createGridDataSet();
         dsMain.setFields([ {
-        	fieldName: "product_id",
-        	dataType: "text"
+            fieldName: "product_id",
+            dataType: "text"
         }, {
-        	fieldName: "product_name"
+            fieldName: "product_name"
         }, {
-        	fieldName: "customer_id"
+            fieldName: "customer_id"
         }, {
-        	fieldName: "customer_name",
+            fieldName: "customer_name",
         }, {
-        	fieldName: "country",
+            fieldName: "country",
         }, {
-        	fieldName: "phone",
+            fieldName: "phone",
         }, {
-        	fieldName: "unit",
+            fieldName: "unit",
         }, {
-        	fieldName: "currency",
+            fieldName: "currency",
         }, {
-        	fieldName: "unit_price",
-        	dataType: "number"
+            fieldName: "unit_price",
+            dataType: "number"
         }, {
-        	fieldName: "quantity",
-        	dataType: "number"
+            fieldName: "quantity",
+            dataType: "number"
         }, {
-        	fieldName: "order_date",
-        	dataType: "datetime",
-        	datetimeFormat: "yyyy-MM-dd"
+            fieldName: "order_date",
+            dataType: "datetime",
+            datetimeFormat: "yyyy-MM-dd"
         }, {
-        	fieldName: "ship_date",
-        	dataType: "datetime",
-        	datetimeFormat: "iso"
+            fieldName: "ship_date",
+            dataType: "datetime",
+            datetimeFormat: "iso"
         } ]);
         dsMain.setSoftDelete(true);
 
@@ -85,7 +85,7 @@
             "header": {
                 "text": "ProductName"
             }
-    	}, {
+        }, {
             "name": "UnitPrice",
             "fieldName": "unit_price",
             "width": 60,
@@ -112,7 +112,7 @@
             "header": {
                 "text": "UnitPrice"
             }
-    	}, {
+        }, {
             "name": "Quantity",
             "fieldName": "quantity",
             "width": 60,
@@ -120,7 +120,7 @@
                 "type": "shape"
             },
             "styles": {
-            	"textAlignment": "far"
+                "textAlignment": "far"
             },
             "dynamicStyles": [{
                 "expressions": [
@@ -139,9 +139,9 @@
                 ]
             }],
             "header": {
-            	"text": "Quantity"
+                "text": "Quantity"
             }
-    	},  {
+        },  {
             "name": "OrderDate",
             "fieldName": "order_date",
             "width": "90",
@@ -157,9 +157,9 @@
                 }
             }],
             "header": {
-            	"text": "OrderDate"
+                "text": "OrderDate"
             }
-    	},  {
+        },  {
             "name": "ShipDate",
             "fieldName": "ship_date",
             "width": "120",
@@ -168,9 +168,9 @@
             "textAlignment": "center"
             },
             "header": {
-            	"text": "ShipDate"
+                "text": "ShipDate"
             }
-    	}, {
+        }, {
             "name": "Country",
             "fieldName": "country",
             "width": "70",
@@ -183,18 +183,18 @@
                 }
             },
             "header": {
-            	"text": "Country"
+                "text": "Country"
             }
-    	}, {
+        }, {
             "name": "Unit",
             "fieldName": "unit",
             "width": "90",
             "styles": {
             },
             "header": {
-            	"text": "Unit"
+                "text": "Unit"
             }
-    	}, {
+        }, {
             "name": "Currency",
             "fieldName": "currency",
             "width": "60",
@@ -203,16 +203,16 @@
                 "background": "#10ff0000"
             },
             "header": {
-            	"text": "Currency"
+                "text": "Currency"
             }
-    	}, {
+        }, {
             "name": "CustomerName",
             "fieldName": "customer_name",
             "width": "90",
             "styles": {
             },
             "header": {
-            	"text": "CustomerName"
+                "text": "CustomerName"
             }
         } ];
         grdMain = DataLudi.createGridView("container");
@@ -256,14 +256,14 @@
                         grdMain.showProgress('Exporting Grid...', true);
                     }
                     memo = 'Exporting started.';
-                    $_showMemo('conMain', 'onStart', memo);
+                    document.getElementById('conMain').value = JSON.stringify(memo);
                 },
                 onProgress: function (grid, current, elapsed, message) {
                     if (!$('#chkProgress')[0].checked) {
                         grdMain.setProgress(0, 100, current, message + ' in ' + elapsed.toLocaleString());
                     }
                     memo += '\r\n' + current + '%, ' + elapsed + 'ms, ' + message;
-                    $_showMemo('conMain', 'onProgress', memo);
+                    document.getElementById('conMain').value = JSON.stringify(memo);
                 },
                 onFinished: function (grid, error, elapsed) {
                     if (!$('#chkProgress')[0].checked) {
@@ -271,10 +271,10 @@
                     }
                     if (error) {
                         memo += '\r\n' + 'Exporting failed: ' + error;
-                        $_showMemo('conMain', 'onFinished - Error', memo);
+                        document.getElementById('conMain').value = JSON.stringify(memo);
                     } else {
                         memo += '\r\n' + 'Exporting completed in ' + elapsed + 'ms.';
-                        $_showMemo('conMain', 'onFinished', memo);
+                        document.getElementById('conMain').value = JSON.stringify(memo);
                     }
                 }
             });
@@ -297,14 +297,14 @@
                         });
                     }
                     memo = 'Exporting started.';
-                    $_showMemo('conMain', 'onStart', memo);
+                    document.getElementById('conMain').value = JSON.stringify(memo);
                 },
                 onProgress: function (grid, current, elapsed, message) {
                     if (!$('#chkProgress')[0].checked) {
                         grdMain.setProgress(0, 100, current, message + ' in ' + elapsed.toLocaleString());
                     }
                     memo += '\r\n' + current + '%, ' + elapsed + 'ms, ' + message;
-                    $_showMemo('conMain', 'onProgress', memo);
+                    document.getElementById('conMain').value = JSON.stringify(memo);
                 },
                 onFinished: function (grid, error, elapsed) {
                     if (!$('#chkProgress')[0].checked) {
@@ -312,10 +312,10 @@
                     }
                     if (err) {
                         memo += '\r\n' + 'Exporting failed: ' + error;
-                        $_showMemo('conMain', 'onFinished - Error', memo);
+                        document.getElementById('conMain').value = JSON.stringify(memo);
                     } else {
                         memo += '\r\n' + 'Exporting completed in ' + elapsed + 'ms.';
-                        $_showMemo('conMain', 'onFinished', memo);
+                        document.getElementById('conMain').value = JSON.stringify(memo);
                     }
                 }
             });
@@ -325,21 +325,23 @@
 </head>
 <body>
     <h3>Async Excel Exporting</h3>
+    <div id="container" style="height: 550px; width: 740px; min-width: 500px"></div>
     <div>
-    	<button id="btnAddRows">Append Rows</button>
-   	</div>
-  	<div>
-    	<button id="btnSave">Save to Local</button>
-    	<button id="btnUpload">Upload to Server</button>
+        <span id="rowCount" style="">0</span> rows.
+    </div>
+    <div>
+        <button id="btnAddRows">Append Rows</button>
+    </div>
+    <div>
+        <button id="btnSave">Save to Local</button>
+        <button id="btnUpload">Upload to Server</button>
         <input type="checkbox" id="chkAsync" checked="checked">Async
         <input type="checkbox" id="chkApplyDynamics" checked="checked">Apply Dynamic Styles
         <input type="checkbox" id="chkProgress" checked="checked">Show Progress
         <input type="checkbox" id="chkModal">Modal
         <input type="checkbox" id="chkCancelable" checked="checked">Cancelable
     </div>
-    <div id="container" style="height: 550px; width: 740px; min-width: 500px"></div>
-    <div>
-        <span id="rowCount" style="">0</span> rows.
-    </div>
+    <p>
+    <textarea id="conMain" class="helpMemo" style="width:730px;min-height:200px;"></textarea>
 </body>
 </html>

@@ -53,8 +53,7 @@
         } ]);
 
         //tree 
-        treeMain = DataLudi.createTreeView('container');
-        treeMain.setColumns([ {
+        var columns = [ {
             "name" : "LoanNumber",
             "fieldName" : "loan_number",
             "width" : "160",
@@ -207,7 +206,11 @@
             "header" : {
                 "text" : "LastDate"
             }
-        } ]);
+        } ];
+        treeMain = DataLudi.createTreeView('container');
+        treeMain.setColumns(columns);
+        treeMain2 = DataLudi.createTreeView('container2');
+        treeMain2.setColumns(columns);
 
         // tree options
         treeMain.checkBar().setVisible(false);
@@ -239,6 +242,30 @@
                 }
             }
         });
+        
+        treeMain2.checkBar().setVisible(false);
+        treeMain2.header().setHeight(30);
+        treeMain2.header().head().setPopupMenu({
+            label: 'DataLudi Version',
+            callback: function () { alert(DataLudi.getVersion()); }
+        });
+
+        treeMain2.setOptions({
+            header: {
+                height: 30
+            },
+            tree: {
+                expanderWithCellStyles: true,
+                iconField: 'icon',
+                iconList: "images01",
+                checkBoxVisible: true,
+                footerLevels: "*",
+                footerStyles: {
+                    background: "#100088ff"
+                }
+            }
+        });
+
 
         // connet Dataset
         var rows = [
@@ -295,33 +322,46 @@
         });
         dsMain.setRows(rows, 1);
         treeMain.setDataSource(dsMain);
+        treeMain2.setDataSource(dsMain);
         treeMain.expandAll();
+        treeMain2.expand(treeMain2.getRow(0), true);
 
-        treeMain.registerImageList({
+        var images = {
             name : "images01",
             rootUrl : "assets/flags_iso/",
             items : [ "ar.png", "at.png", "be.png", "br.png", "ca.png", "de.png", "dk.png", "et.png", "fi.png", "fr.png", "it.png", "jp.png", "kg.png" ]
-        });
-
+        };
+        treeMain.registerImageList(images);
+        treeMain2.registerImageList(images);
+        
         // dsMain events
         dsMain.onRowCountChanged = function(ds, count) {
             $("#rowCount").css("color", "blue").text(count.toLocaleString());
+            $("#rowCount2").css("color", "blue").text(ds.rowCount().toLocaleString())
         };
 
         // buttons
-        $('#btnLevels').click(function() {
+        $('#btnLevels').click(function () {
             treeMain.setTreeOptions({
                 /** footerDisplayCallback이 우선한다 */
-                footerDisplayCallback : null,
-                footerLevels : [ 1 ]
+                footerDisplayCallback: null, 
+                footerLevels: [1]
             });
         });
-        $('#btnCallback').click(function() {
+        $('#btnCallback').click(function () {
             treeMain.setTreeOptions({
-                footerDisplayCallback : function(row) {
+                footerDisplayCallback: function (row) {
                     return row.level() == 2;
                 }
             });
+        });
+        $('input:radio[name=rgpSummaryScope]').click(function() {
+            var value = $("input[name=rgpSummaryScope]:checked").val();
+            treeMain2.treeOptions().setSummaryScope(value);
+        });
+        $('input:radio[name=rgpRowScope]').click(function() {
+            var value = $("input[name=rgpRowScope]:checked").val();
+            treeMain2.treeOptions().setRowSummaryScope(value);
         });
     });
 </script>
@@ -334,5 +374,27 @@
     </div>
     <button id="btnLevels">배열로 레벨 지정하기</button>
     <button id="btnCallback">콜백으로 레벨 지정하기</button>
+    <p>
+    <h5>Summary Scope</h5>
+    <div>
+        <span>Tree Scope: </span>
+        <input type="radio" name="rgpSummaryScope" value="descendant" checked="checked">TreeSummaryScope.DESCENDTANT
+        <input type="radio" name="rgpSummaryScope" value="child">CHILD
+        <input type="radio" name="rgpSummaryScope" value="group">GROUP
+        <input type="radio" name="rgpSummaryScope" value="leaf">LEAF
+    </div>
+    <div>
+        <span>Row Scope: </span>
+        <input type="radio" name="rgpRowScope" value="descendant" checked="checked">TreeSummaryScope.DESCENDTANT
+        <input type="radio" name="rgpRowScope" value="all">ALL
+        <input type="radio" name="rgpRowScope" value="child">CHILD
+        <input type="radio" name="rgpRowScope" value="parentChild">PARENT_CHILD
+        <input type="radio" name="rgpRowScope" value="group">GROUP
+        <input type="radio" name="rgpRowScope" value="leaf">LEAF
+    </div>        
+    <div id="container2" style="height: 550px; width: 740px; min-width: 500px"></div>
+    <div>
+        <span id="rowCount2" style="">0</span> rows.
+    </div>    
 </body>
 </html>
